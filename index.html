@@ -5285,6 +5285,12 @@ function mostrarAbertura(){
 const NAVEGADOR = !window.obsstudio && !PAINEL;
 if (NAVEGADOR){
   document.body.classList.add("navegador");
+  // no navegador a tela costuma ser mais "baixa" que 16:9 (barra de abas, favoritos): encolhe tudo para caber
+  const encaixar = () => {
+    const z = Math.min(1, (innerHeight * 16 / 9) / innerWidth);
+    document.documentElement.style.zoom = z < 0.995 ? z : "";
+  };
+  encaixar(); addEventListener("resize", encaixar);
   const liberar = () => { audio(); trilhaDoEstado(); document.removeEventListener("pointerdown", liberar); document.removeEventListener("keydown", liberar); };
   document.addEventListener("pointerdown", liberar); document.addEventListener("keydown", liberar);
 }
