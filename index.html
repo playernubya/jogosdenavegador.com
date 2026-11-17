@@ -839,6 +839,7 @@ const DEMO = P.has("demo");
 const PAINEL = P.has("painel");
 const BOT_TOKEN = P.get("bot") || "";
 let STREAMER = "";   // nome de exibição do dono do canal (usado nas falas)
+if (P.has("trocar") || P.has("novo")){ try { localStorage.removeItem(K_CANAL); } catch(e){} }
 {
   const salvo = lsGet(K_CANAL, null);
   if (salvo && salvo.login){ CONFIG.canal = salvo.login; STREAMER = salvo.nome || salvo.login; }
@@ -3804,7 +3805,7 @@ function montarDesktop(){
   ic.querySelector('[data-ic="volume"] svg').insertAdjacentHTML("beforeend", `<path class="v1" d="M19 12q2.5 4 0 8" stroke="#4a0d2e" stroke-width="1.6" fill="none"/><path class="v2" d="M22 9q5 7 0 14" stroke="#4a0d2e" stroke-width="1.6" fill="none"/><path class="v3" d="M25 6q7.5 10 0 20" stroke="#4a0d2e" stroke-width="1.6" fill="none"/>`);
   ic.querySelectorAll(".dic").forEach(el => {
     el.addEventListener("mousedown", () => { ic.querySelectorAll(".dic.sel").forEach(o => o !== el && o.classList.remove("sel")); el.classList.add("sel"); });
-    el.addEventListener("dblclick", () => { audio(); atividade(); acaoIcone(el.dataset.ic); atualizarIcones(); });
+    el.addEventListener(NAVEGADOR ? "click" : "dblclick", () => { audio(); atividade(); acaoIcone(el.dataset.ic); atualizarIcones(); });
   });
   atualizarIcones();
   setInterval(atualizarIcones, 600);
@@ -5260,11 +5261,13 @@ function mostrarAbertura(){
     <div class="titulo"><div class="qi">QI DO <span>CHAT</span></div><div class="sub">${rodada ? "QUEM ENCARA A PRÓXIMA?" : "O QUIZ VAI COMEÇAR!"}</div></div>
     <div class="dialogo">Responda digitando a letra no chat.<br>Quanto mais rápido, mais <b>gemas</b>.</div>
     <div class="botoes">${LETRAS.map(l=>`<span>${l}</span>`).join("")}</div>
-    ${NAVEGADOR && !DEMO ? `<button class="comecar" id="btcomecar">▶ COMEÇAR</button><div class="dica">ou digite <b>!qi</b> no chat do canal</div>` : ``}
+    ${NAVEGADOR && !DEMO ? `<button class="comecar" id="btcomecar">▶ COMEÇAR</button><div class="dica">ou digite <b>!qi</b> no chat de <b>#${esc(CONFIG.canal || "")}</b> · <a href="#" id="bttrocar" style="color:var(--gema)">trocar de canal</a></div>` : ``}
     <div class="status" id="status">${statusTexto()}</div>
     <div class="credito">um quadro criado por <b>PlayerNubya</b></div>`);
   const bt = document.getElementById("btcomecar");
   if (bt) bt.addEventListener("click", () => { audio(); comando("", true); });
+  const tr = document.getElementById("bttrocar");
+  if (tr) tr.addEventListener("click", ev => { ev.preventDefault(); try { localStorage.removeItem(K_CANAL); } catch(e){} location.href = location.pathname; });
 }
 /* aberto num navegador comum (fora do OBS): fundo escuro, botão de começar e som liberado no 1º clique */
 const NAVEGADOR = !window.obsstudio && !PAINEL;
