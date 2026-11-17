@@ -4037,6 +4037,7 @@ function iniciarPalavra(temaPedido){
       pintar(); SOM.opcao(r.filter(x => x === "v").length % 4);
       if (w === segredo) setTimeout(() => terminar({ login, nome }), 700);
     },
+    encerrar(){ terminar(null); },
     parar(){ acabou = true; clearInterval(tick); clearInterval(demo); }
   };
   // demonstração: um chat falso chuta palavras e alguém acerta perto dos 25 s
@@ -4142,6 +4143,7 @@ function iniciarCaca(){
       SOM.combo(Math.min(8, achadas.size + 1));
       if (achadas.size === postas.length) setTimeout(() => terminar(true), 900);
     },
+    encerrar(){ terminar(false); },
     parar(){ acabou = true; clearInterval(tick); clearInterval(demo); }
   };
   let demo = null;
@@ -4596,7 +4598,7 @@ const letraDe = i => (atual && atual.vf) ? ["V", "F"][i] : LETRAS[i];
 /* o que cada ícone faz (dois cliques, no navegador ou no "Interagir" do OBS) */
 const VOLUMES98 = [[0.09, "baixo"], [0.17, "médio"], [0.32, "alto"]];
 function acaoIcone(k){
-  if (k === "qi") comando("", true);
+  if (k === "qi"){ if (temaAtual === "fato") temaAtual = GRUPOS[CONFIG.temaPadrao] ? CONFIG.temaPadrao : "mix"; comando("", true); }
   else if (k === "palavra") comando("palavra", true);
   else if (k === "caca") comando("caca", true);
   else if (k === "detetive") comando("detetive", true);
@@ -5058,6 +5060,7 @@ function mostrarPausa(){
 
 function fimDeRodada(){
   clearInterval(tick); clearTimeout(proximo);
+  if (temaAtual === "fato") temaAtual = GRUPOS[CONFIG.temaPadrao] ? CONFIG.temaPadrao : "mix";   // o fato ou fake vale só para uma rodada
   win.classList.remove("relampago");
   const lista = Object.values(rodada ? rodada.pontos : {}).sort((a,b)=>b.pts-a.pts);
   const campeao = lista[0];
