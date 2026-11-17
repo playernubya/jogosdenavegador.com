@@ -3826,7 +3826,7 @@ function montarDesktop(){
     <div class="tb ini"><svg viewBox="0 0 7 6"><use href="#coracao"/></svg></div>
     <div class="tb ico">${svgIcone98("pastaA")}</div><div class="tb ico">${svgIcone98("pastaB")}</div><div class="tb ico">${svgIcone98("pastaAberta")}</div><div class="tb ico">${svgIcone98("pastaC")}</div>
     <div class="tsep"></div>
-    <div class="tb tarefa ativa" id="tbjogo">${svgIcone98("qi")}<span id="tbnome">QI_DO_CHAT.EXE</span></div>
+    <div class="tb tarefa ativa" id="tbjogo">${svgIcone98("pc")}<span id="tbnome">JOGOSDENAVEGADOR.COM</span></div>
     <div class="tb tarefa" id="tbmsn">${svgIcone98("msn")}<span>chat da live</span></div>
     <div class="busca98">Pesquisar…<i>×</i></div>
     <div class="tray"><span class="vivo">● AO VIVO</span><span class="hora"><b id="relogio98"></b><small id="data98"></small></span></div>`;
@@ -4691,23 +4691,14 @@ function terminarIntro(){
   document.querySelectorAll(".zoomjan").forEach(e => e.remove());
 }
 function abrirPrograma(){
-  const ic = document.querySelector('.dic[data-ic="qi"]'), cur = document.getElementById("cursor98");
-  const col = document.getElementById("colunaquiz"), masc = document.getElementById("mascote");
-  if (!ic || !cur || !cur.animate){ return; }
+  // abertura: só a janela do jogosdenavegador.com surgindo da barra de tarefas (nenhum jogo começa sozinho)
+  const col = document.getElementById("colunaquiz"), masc = document.getElementById("mascote"), tb = document.getElementById("tbjogo");
+  if (!tb || !win.animate) return;
   introRodando = true;
   col.classList.add("fechado98"); masc.classList.add("fechado98");
-  tarefaJogo(null, false);
   const passo = (ms, fn) => introTimers.push(setTimeout(() => { try { fn(); } catch(e){} }, ms));
-  const ri = ic.getBoundingClientRect();
-  const alvoX = ri.left + ri.width * 0.55, alvoY = ri.top + ri.height * 0.3;
-  const iniX = innerWidth * 0.42, iniY = innerHeight * 0.55;
-  cur.style.left = "0px"; cur.style.top = "0px"; cur.style.opacity = 1;
-  cur.animate([{ transform: `translate(${iniX}px,${iniY}px)` }, { transform: `translate(${alvoX}px,${alvoY}px)` }],
-    { duration: 850, delay: 350, easing: "cubic-bezier(.45,.05,.3,1)", fill: "forwards" });
-  passo(1300, () => { ic.classList.add("sel"); SOM.clique(); });
-  passo(1480, () => { ultimoClique = 0; SOM.clique(); cur.classList.add("espera"); });
-  passo(2050, () => {
-    const rw = win.getBoundingClientRect();
+  passo(500, () => {
+    const ri = tb.getBoundingClientRect(), rw = win.getBoundingClientRect();
     const z = document.createElement("div"); z.className = "zoomjan"; document.body.appendChild(z);
     z.animate([
       { left: ri.left + "px", top: ri.top + "px", width: ri.width + "px", height: ri.height + "px" },
@@ -4715,13 +4706,12 @@ function abrirPrograma(){
     ], { duration: 380, easing: "steps(7)", fill: "forwards" });
     setTimeout(() => z.remove(), 420);
   });
-  passo(2450, () => {
+  passo(900, () => {
     col.classList.remove("fechado98"); masc.classList.remove("fechado98");
     tarefaJogo(null, true); SOM.abrir();
     win.classList.remove("tremeu"); void win.offsetWidth; win.classList.add("tremeu");
+    introRodando = false;
   });
-  passo(2900, () => { cur.classList.remove("espera"); });
-  passo(3600, () => { cur.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 400, fill: "forwards" }); introRodando = false; });
 }
 
 function posicionarColuna(){
