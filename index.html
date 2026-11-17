@@ -144,6 +144,19 @@ body.demo{background:radial-gradient(ellipse at 70% 0%,#c2266f 0%,#6b1040 45%,#3
 
 /* abertura / pausa */
 .titulo{text-align:center;padding:.6vw 0 .4vw}
+/* tela inicial: escolha do jogo */
+.titulo.menujogos .qi{font-size:2.75vw;white-space:nowrap}
+.jogos98{display:flex;flex-direction:column;gap:.55vw;margin:1vw 0 .8vw}
+.jogo98{display:flex;align-items:center;gap:1vw;width:100%;text-align:left;background:var(--creme);color:var(--vinho);border:.2vw solid var(--escuro);box-shadow:.3vw .3vw 0 var(--escuro);padding:.45vw .9vw;cursor:pointer;font:inherit;animation:jogoEntra .35s calc(.25s + var(--i) * .08s) steps(4) both}
+.jogo98:hover{background:#ffe9d2;transform:translate(-.1vw,-.1vw);box-shadow:.4vw .4vw 0 var(--escuro)}
+.jogo98:active{transform:translate(.2vw,.2vw);box-shadow:.1vw .1vw 0 var(--escuro)}
+.jogo98 .ji svg{width:2.6vw;height:2.6vw;display:block}
+.jogo98 .jt{display:flex;flex-direction:column;flex:1;min-width:0}
+.jogo98 .jt b{font:400 1.6vw/1 "QI Titulo",sans-serif;letter-spacing:.05vw}
+.jogo98 .jt small{font:400 .95vw "QI Mono",monospace;opacity:.75}
+.jogo98 code{font:400 1vw "QI Mono",monospace;background:var(--vinho);color:var(--gema);padding:.15vw .5vw;white-space:nowrap}
+@keyframes jogoEntra{0%{opacity:0;transform:translateX(2vw)}100%{opacity:1;transform:none}}
+
 .qi{font:400 6vw/1 "QI Titulo",sans-serif;letter-spacing:.15vw;text-shadow:.35vw .35vw 0 var(--escuro)}
 .qi span{color:var(--rosa)}
 .sub{display:inline-block;margin-top:.8vw;background:var(--creme);color:var(--vinho);font:400 1.5vw "QI Titulo",sans-serif;padding:.2vw 1vw;border:.2vw solid var(--escuro);transform:rotate(-2deg);box-shadow:.3vw .3vw 0 var(--escuro)}
@@ -5257,15 +5270,21 @@ function mostrarAbertura(){
   if (!mostrarAbertura.ligou){ mostrarAbertura.ligou = true; SOM.boot(); abrirPrograma(); }
   trilhaDoEstado();
   if (Math.random() < 0.6) mascoteFala(Math.random() < 0.45 ? "aleatorias" : "abertura");
-  tela("QI_DO_CHAT.EXE", `
-    <div class="titulo"><div class="qi">QI DO <span>CHAT</span></div><div class="sub">${rodada ? "QUEM ENCARA A PRÓXIMA?" : "O QUIZ VAI COMEÇAR!"}</div></div>
-    <div class="dialogo">Responda digitando a letra no chat.<br>Quanto mais rápido, mais <b>gemas</b>.</div>
-    <div class="botoes">${LETRAS.map(l=>`<span>${l}</span>`).join("")}</div>
-    ${NAVEGADOR && !DEMO ? `<button class="comecar" id="btcomecar">▶ COMEÇAR</button><div class="dica">ou digite <b>!qi</b> no chat de <b>#${esc(CONFIG.canal || "")}</b> · <a href="#" id="bttrocar" style="color:var(--gema)">trocar de canal</a></div>` : ``}
+  // tela inicial: a pessoa escolhe o jogo
+  const JOGOS = [
+    ["qi", "QI DO CHAT", "quiz de A, B, C ou D", "!qi"],
+    ["palavra", "PALAVRA SECRETA", "adivinhe a palavra em 6 chutes", "!qi palavra"],
+    ["caca", "CAÇA-PALAVRAS", "ache as palavras na grade", "!qi caca"],
+    ["detetive", "DETETIVE DO CHAT", "ache as pistas escondidas", "!qi detetive"],
+    ["fato", "FATO OU FAKE", "verdade ou mentira?", "!qi fato"]
+  ];
+  tela("JOGOSDENAVEGADOR.COM", `
+    <div class="titulo menujogos"><div class="qi">jogosdenavegador<span>.com</span></div><div class="sub">${rodada ? "QUAL VAI SER O PRÓXIMO?" : "ESCOLHA UM JOGO"}</div></div>
+    <div class="jogos98">${JOGOS.map(([k, n, d, c], i) => `<button class="jogo98" data-jogo="${k}" style="--i:${i}"><span class="ji">${svgIcone98(k)}</span><span class="jt"><b>${n}</b><small>${d}</small></span><code>${c}</code></button>`).join("")}</div>
+    ${NAVEGADOR && !DEMO ? `<div class="dica">clique num jogo ou digite o comando no chat de <b>#${esc(CONFIG.canal || "")}</b> · <a href="#" id="bttrocar" style="color:var(--gema)">trocar de canal</a></div>` : `<div class="dica">a dona do canal e os mods escolhem o jogo pelo comando no chat</div>`}
     <div class="status" id="status">${statusTexto()}</div>
-    <div class="credito">um quadro criado por <b>PlayerNubya</b></div>`);
-  const bt = document.getElementById("btcomecar");
-  if (bt) bt.addEventListener("click", () => { audio(); comando("", true); });
+    <div class="credito">criado por <b>PlayerNubya</b></div>`);
+  conteudo.querySelectorAll(".jogo98").forEach(el => el.addEventListener("click", () => { audio(); atividade(); SOM.clique(); acaoIcone(el.dataset.jogo); }));
   const tr = document.getElementById("bttrocar");
   if (tr) tr.addEventListener("click", ev => { ev.preventDefault(); try { localStorage.removeItem(K_CANAL); } catch(e){} location.href = location.pathname; });
 }
